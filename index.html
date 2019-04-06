@@ -1,164 +1,114 @@
+<!doctype html>
 <html>
+
+<head>
+
+  <title>Rope Approximation</title>
+
+</head>
 
 <body>
 
-<script>
+  <p>Move cursor and use scroll wheel. Read more on <a href="https://github.com/gustavgb/rope-approximation">GitHub</a>.</p>
 
+  <script src="lib.js"></script>
+  <script>
+    var canvas = document.createElement('canvas')
+    var ctx = canvas.getContext('2d')
 
-var canvas = document.createElement('canvas')
-var ctx = canvas.getContext('2d')
+    canvas.width = 500
+    canvas.height = 500
 
-canvas.width = 500
-canvas.height = 500
+    canvas.style.border = '1px solid black'
 
-canvas.style.border = '1px solid black'
+    document.body.appendChild(canvas)
 
-document.body.appendChild(canvas)
+    var mouseX = 0
+    var mouseY = 0
+    var length = 100
 
-var mouseX = 0
-var mouseY = 0
-var length = 100
-
-function drawPoint (x, y, color) {
-  ctx.beginPath()
-  ctx.arc(x, y, 10, 0, 2*Math.PI, false)
-  ctx.fillStyle = color
-  ctx.fill()
-}
-
-function createF (qx, qy) {
-  return function (a) {
-    var r = qy / qx
-    var b = r - a * qx
-
-    var tx = -b / (2 * a)
-    var ty = -(b * b) / (4 * a)
-    var dx = tx - qx
-    var dy = ty - qy
-
-    var len = Math.hypot(tx, ty) + Math.hypot(dx, dy)
-
-    return len - length
-  }
-}
-
-
-function derivative(f) {
-  var h = 0.001;
-  return function(x) { return (f(x + h) - f(x - h)) / (2 * h); };
-}
-
-function solve (f) {
-  var precision = 0.001;
-  var prevGuess = 0;
-
-  function newtonsMethod(guess) {
-    if (guess === null || guess === undefined)
-      guess = 0;
-
-    if (Math.abs(prevGuess - guess) > precision) {
-      prevGuess = guess;
-      var approx = guess - (f(guess) / derivative(f)(guess));
-
-      return newtonsMethod(approx);
-    } else {
-      return guess;
+    function drawPoint(x, y, color) {
+      ctx.beginPath()
+      ctx.arc(x, y, 10, 0, 2 * Math.PI, false)
+      ctx.fillStyle = color
+      ctx.fill()
     }
-  }
 
-  return newtonsMethod(-10)
-}
+    function loop() {
+      requestAnimationFrame(loop)
 
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-function loop () {
-  requestAnimationFrame(loop)
+      var ox = 200
+      var oy = 200
 
-  ctx.fillStyle = 'white'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+      var dist = Math.hypot(mouseX - ox, mouseY - oy)
 
-  var px, py, qx, qy
+      if (dist > length) {
+        mouseX = (mouseX - ox) / dist * (length - 1) + ox
+        mouseY = (mouseY - oy) / dist * (length - 1) + oy
+      }
 
-  var ox = 200
-  var oy = 200
+      var formula = approximateCurve(mouseX, mouseY, ox, oy, length)
+      if (formula === null) {
+        ctx.beginPath()
+        ctx.moveTo(mouseX, mouseY)
+        ctx.lineTo(ox, oy)
+        ctx.strokeStyle = 'black'
+        ctx.stroke()
+      } else {
+        var a = formula.a
+        var b = formula.b
+        var px = formula.x1
+        var py = formula.y1
+        var qx = formula.x2
+        var qy = formula.y2
 
-  var dist = Math.hypot(mouseX - ox, mouseY - oy)
+        ctx.beginPath()
+        ctx.moveTo(px, py)
+        for (var i = 1; i < qx; i++) {
+          var x = i
+          var y = a * (x * x) + b * x
 
-  if (dist > length) {
-    mouseX = (mouseX - ox) / dist * (length - 1) + ox
-    mouseY = (mouseY - oy) / dist * (length - 1) + oy
-  }
+          ctx.lineTo(px + x, py + (a * (x * x) + b * x))
+        }
+        var x = qx
+        var y = a * (qx * qx) + b * qx
 
-  if (mouseX > ox) {
-    px = ox
-    py = oy
+        ctx.lineTo(px + x, py + y)
+        ctx.strokeStyle = 'black'
+        ctx.stroke()
+      }
 
-    qx = mouseX - ox
-    qy = mouseY - oy
-  } else {
-    px = mouseX
-    py = mouseY
+      drawPoint(mouseX, mouseY, 'blue')
+      drawPoint(ox, oy, 'blue')
 
-    qx = ox - mouseX
-    qy = oy - mouseY
-  }
-
-  if (qx < 5) {
-    ctx.beginPath()
-    ctx.moveTo(px, py)
-    ctx.lineTo(px + qx, py + qy)
-    ctx.strokeStyle = 'black'
-    ctx.stroke()
-  } else {
-    var a = solve(createF(qx, qy))
-    var b = (qy / qx) - a * qx
-
-    ctx.beginPath()
-    ctx.moveTo(px, py)
-    for (var i = 1; i < qx; i++) {
-      var x = i
-      var y = a * (x*x) + b*x
-
-      ctx.lineTo(px + x, py + (a * (x*x) + b*x))
+      ctx.textBaseline = 'top'
+      ctx.textAlign = 'left'
+      ctx.font = '20px sans-serif'
+      ctx.fillStyle = 'black'
+      ctx.fillText('Length: ' + length, 10, 10)
     }
-    var x = qx
-    var y = a * (qx*qx) + b*qx
 
-    ctx.lineTo(px + x, py + y)
-    ctx.strokeStyle = 'black'
-    ctx.stroke()
-  }
+    window.addEventListener('mousemove', function(e) {
+      var rect = canvas.getBoundingClientRect()
 
-  drawPoint(px, py, 'blue')
-  drawPoint(px + qx, py + qy, 'blue')
+      mouseX = e.clientX - rect.x
+      mouseY = e.clientY - rect.y
+    })
 
-  ctx.textBaseline = 'top'
-  ctx.textAlign = 'left'
-  ctx.font = '20px sans-serif'
-  ctx.fillStyle = 'black'
-  ctx.fillText('Length: ' + length, 10, 10)
-}
+    window.addEventListener('wheel', function(e) {
+      length += e.deltaY / 10
 
-window.addEventListener('mousemove', function (e) {
-  var rect = canvas.getBoundingClientRect()
+      if (length < 50) {
+        length = 50
+      }
+    })
 
-  mouseX = e.clientX - rect.x
-  mouseY = e.clientY - rect.y
-})
-
-window.addEventListener('wheel', function (e) {
-  length += e.deltaY / 10
-
-  if (length < 50) {
-    length = 50
-  }
-})
-
-loop()
-
-
+    loop()
   </script>
 
-  </body>
-
+</body>
 
 </html>

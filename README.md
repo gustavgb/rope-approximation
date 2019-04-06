@@ -48,8 +48,9 @@ When recieving two points and a length.
 
 1. Name `A` and `B` accordingly
 2. Translate to `A`
-3. Is `x ≈ 0`. If yes draw line instead. End algorithm
+3. Only continue if `x ≉  0`
 4. Otherwise calculate `b`
-5. Solve `f(x) ≈ 0` and calculate `a`. End algorithm
+5. Solve `f(x) ≈ 0` and calculate `a`
+6. Return `a` and `b`
 
 ## Demo [here](https://gustavgb.github.io/rope-approximation)
