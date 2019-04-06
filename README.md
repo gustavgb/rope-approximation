@@ -12,7 +12,7 @@ When you want to model a rope between two points, you're essentially trying to s
 
 However, the catenary curve is a type of hyperbolic cosine function:
 
-![Catenary formula](https://wikimedia.org/api/rest_v1/media/math/render/svg/1e2d387d79e500a90035448068febb17e69d8e5c)
+![Catenary formula](https://latex.codecogs.com/gif.latex?y%3Da%5Ccosh%20%5Cleft%20%28%20%5Cfrac%20%7Bx%7D%7Ba%7D%20%5Cright%20%29)
 
 which makes it difficult to solve the problem. Instead I have resorted to (less correct but good enough) parabolas, which makes it a lot easier.
 
