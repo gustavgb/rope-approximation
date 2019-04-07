@@ -1,16 +1,18 @@
 function createF (qx, qy, len) {
   return function (a) {
-    var r = qy / qx
-    var b = r - a * qx
+    var b = qy / qx - a * qx
 
-    var tx = -b / (2 * a)
-    var ty = -(b * b) / (4 * a)
-    var dx = tx - qx
-    var dy = ty - qy
+    var sum = 0
+    var interval = qx / 20
+    for (var x = 0; x < qx - interval / 2; x += interval) {
+      var x2 = x + interval
+      sum += Math.hypot(
+        x2 - x,
+        (x2 * x2 * a + x2 * b) - (x * x * a + x * b)
+      )
+    }
 
-    var tryLength = Math.hypot(tx, ty) + Math.hypot(dx, dy)
-
-    return tryLength - len
+    return sum - len
   }
 }
 
@@ -20,8 +22,9 @@ function derivative (f) {
 }
 
 function solve (f) {
-  var precision = 0.001
+  var precision = 0.0001
   var prevGuess = 0
+  var df = derivative(f)
 
   function newtonsMethod (guess) {
     if (guess === null || guess === undefined) {
@@ -30,7 +33,7 @@ function solve (f) {
 
     if (Math.abs(prevGuess - guess) > precision) {
       prevGuess = guess
-      var approx = guess - (f(guess) / derivative(f)(guess))
+      var approx = guess - (f(guess) / df(guess))
 
       return newtonsMethod(approx)
     } else {
@@ -58,20 +61,22 @@ function approximateCurve (x1, y1, x2, y2, len) {
     qy = y2 - y1
   }
 
-  if (qx < 5) {
-    return null
+  var a, b
+  if (qx < 1 || qx * qx + qy * qy >= len * len) {
+    a = 0
+    b = (qy / qx) - a * qx
   } else {
-    var a = solve(createF(qx, qy, len))
-    var b = (qy / qx) - a * qx
+    a = solve(createF(qx, qy, len))
+    b = (qy / qx) - a * qx
+  }
 
-    return {
-      x1: px,
-      y1: py,
-      x2: qx,
-      y2: qy,
-      a: a,
-      b: b
-    }
+  return {
+    x1: px,
+    y1: py,
+    x2: qx,
+    y2: qy,
+    a: a,
+    b: b
   }
 }
 
