@@ -24,6 +24,8 @@ The parabola is the curve for a quadratic function, which has the following form
 
 It is possible to find the parabola formula, when you know two points on the curve and *curvature*, which is described by `a`.
 
+<i><p><a href="https://commons.wikimedia.org/wiki/File:Parabeln-var-s.svg#/media/File:Parabeln-var-s.svg"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Parabeln-var-s.svg" alt="Parabeln-var-s.svg" height="307" width="226"></a><br>By <a href="//commons.wikimedia.org/wiki/User:Ag2gaeh" title="User:Ag2gaeh">Ag2gaeh</a> - <span class="int-own-work" lang="en">Own work</span>, <a href="https://creativecommons.org/licenses/by-sa/4.0" title="Creative Commons Attribution-Share Alike 4.0">CC BY-SA 4.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=44984417">Link</a></p></i>
+
 First we name the two points, so `Ax < Bx`. We then translate the coordinate system to A, so `A = (0, 0)`. Let `B = (x, y)`. This means that the `c` component becomes `0`, because the curve intersects the X-axis at `y = 0`.
 
 We can calculate `b` by using the quadratic formula:
